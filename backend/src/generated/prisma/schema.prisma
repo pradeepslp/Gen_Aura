@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AccountStatus {
+  PENDING
+  APPROVED
+  SUSPENDED
+  REJECTED
+}
+
+model User {
+  id         String        @id @default(uuid())
+  email      String        @unique
+  password   String
+  roleId     String
+  role       Role          @relation(fields: [roleId], references: [id])
+  status     AccountStatus @default(PENDING)
+  approvedBy String? // ID of AdminUser
+  approvedAt DateTime?
+
+  // Relations
+  activityLogs         UserActivityLog[]
+  auditLogs            AuditLog[]
+  refreshTokens        RefreshToken[]
+  doctorAssignments    DoctorPatientAssignment[] @relation("DoctorAssignment")
+  patientAssignments   DoctorPatientAssignment[] @relation("PatientAssignment")
+  prescriptionsWritten Prescription[]            @relation("DoctorPrescription")
+  prescriptions        Prescription[]            @relation("PatientPrescription")
+  labReports           LabReport[]
+  securityAlerts       SecurityAlert[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdminUser {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+
+  // Relations
+  refreshTokens AdminRefreshToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id              String           @id @default(uuid())
+  name            String           @unique
+  description     String?
+  users           User[]
+  rolePermissions RolePermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Permission {
+  id              String           @id @default(uuid())
+  name            String           @unique // e.g., 'view_patient', 'update_diagnosis'
+  description     String?
+  rolePermissions RolePermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model Patient {
+  id           String   @id @default(uuid())
+  firstName    String
+  lastName     String
+  dateOfBirth  DateTime
+  medicalNotes String? // Should be encrypted at app level
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DoctorPatientAssignment {
+  doctorId  String
+  patientId String
+
+  doctor  User @relation("DoctorAssignment", fields: [doctorId], references: [id])
+  patient User @relation("PatientAssignment", fields: [patientId], references: [id])
+
+  assignedAt DateTime @default(now())
+
+  @@id([doctorId, patientId])
+}
+
+model LabReport {
+  id         String  @id @default(uuid())
+  patientId  String
+  reportUrl  String
+  uploadedBy String?
+
+  patient User @relation(fields: [patientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Prescription {
+  id         String @id @default(uuid())
+  patientId  String
+  doctorId   String
+  medication String
+  dosage     String
+
+  patient User @relation("PatientPrescription", fields: [patientId], references: [id])
+  doctor  User @relation("DoctorPrescription", fields: [doctorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String? // Can be null if action is from unauthenticated user / admin
+  action    String
+  resource  String
+  ip        String?
+  timestamp DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+}
+
+model UserActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  resource  String
+  ip        String?
+  device    String?
+  timestamp DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model SecurityAlert {
+  id        String  @id @default(uuid())
+  userId    String
+  riskScore Int
+  reason    String
+  resolved  Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model AdminRefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  adminId   String
+  expiresAt DateTime
+
+  admin     AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+}
