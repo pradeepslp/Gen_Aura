@@ -5,9 +5,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "npx tsx src/server.ts",
     "dev": "npx tsx watch src/server.ts",
-    "build": "npx prisma generate && tsc",
+    "build": "npx prisma generate",
     "prisma:generate": "NODE_OPTIONS='--loader ts-node/esm' npx prisma generate",
     "seed": "npx tsx src/seed.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
