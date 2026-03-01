@@ -10,8 +10,12 @@ const port = process.env.PORT || 3001;
 
 const startServer = async () => {
     try {
-        // 1. Connect Redis (non-blocking in dev)
-        connectRedis();
+        // 1. Connect Redis (non-blocking, gracefully skip if unavailable)
+        try {
+            await connectRedis();
+        } catch (err) {
+            logger.warn('Redis unavailable, continuing without cache:', err);
+        }
 
         // 2. Test Prisma Connection
         await prisma.$connect();
