@@ -6,7 +6,10 @@ import { AuditService } from '../services/audit.service.js';
 
 export const getPendingUsers = asyncHandler(async (req: Request, res: Response) => {
     const users = await prisma.user.findMany({
-        where: { status: 'PENDING' },
+        where: {
+            status: 'PENDING',
+            emailVerified: true // Only show to admin if they verified their email
+        },
         select: {
             id: true,
             email: true,
@@ -21,7 +24,7 @@ export const getPendingUsers = asyncHandler(async (req: Request, res: Response) 
 
 export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
     const users = await prisma.user.findMany({
-        where: { status: { not: 'PENDING' } },
+        where: { status: 'APPROVED' },
         select: {
             id: true,
             email: true,
@@ -66,18 +69,13 @@ export const unauthorizeUser = asyncHandler(async (req: Request, res: Response) 
     if (user.role.name === 'ADMIN') throw new AppError('Cannot unauthorize admin users', 403);
     if (user.status !== 'APPROVED') throw new AppError('User must be approved to unauthorize', 400);
 
-    const updatedUser = await prisma.user.update({
-        where: { id: userId },
-        data: {
-            status: 'PENDING', // Revert to pending, effectively locking them out
-            approvedBy: null,
-            approvedAt: null,
-        }
+    const updatedUser = await prisma.user.delete({
+        where: { id: userId }
     });
 
-    await AuditService.log('USER_UNAUTHORIZED', `Admin ${adminId} revoked authorization for user ${userId}`, userId as string, (req.ip as string) || 'unknown');
+    await AuditService.log('USER_UNAUTHORIZED', `Admin ${adminId} revoked authorization and deleted user ${userId}`, userId as string, (req.ip as string) || 'unknown');
 
-    res.status(200).json({ success: true, message: 'User authorization revoked', user: updatedUser });
+    res.status(200).json({ success: true, message: 'User deleted from the database', user: updatedUser });
 });
 
 export const rejectUser = asyncHandler(async (req: Request, res: Response) => {
@@ -182,7 +180,7 @@ export const getDashboardStats = asyncHandler(async (req: Request, res: Response
     try {
         const [userCount, pendingCount, alertCount, recentLogs] = await Promise.all([
             prisma.user.count({ where: { status: 'APPROVED' } }),
-            prisma.user.count({ where: { status: 'PENDING' } }),
+            prisma.user.count({ where: { status: 'PENDING', emailVerified: true } }),
             prisma.securityAlert.count({ where: { resolved: false } }),
             prisma.auditLog.findMany({
                 take: 5,

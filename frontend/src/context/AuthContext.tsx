@@ -10,6 +10,7 @@ interface AuthContextType {
     adminLogin: (credentials: any) => Promise<void>;
     register: (data: any) => Promise<void>;
     logout: () => void;
+    hydrateSession: () => Promise<void>;
     isLoading: boolean;
 }
 
@@ -20,12 +21,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
 
-    useEffect(() => {
+    const hydrateSession = async () => {
+        const token = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
+
         if (storedUser) {
             setUser(JSON.parse(storedUser));
         }
+
+        if (token) {
+            try {
+                const res = await authApi.getMe();
+                // Ensure we handle the nested structure appropriately
+                const freshUser = res.data?.data?.user;
+                if (freshUser) {
+                    setUser(freshUser);
+                    localStorage.setItem('user', JSON.stringify(freshUser));
+                }
+            } catch (error) {
+                console.error("Session hydration failed", error);
+            }
+        }
         setIsLoading(false);
+    };
+
+    useEffect(() => {
+        hydrateSession();
     }, []);
 
     const login = async (credentials: any) => {
@@ -40,13 +61,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Redirect based on role or status
             if (userData.status === 'PENDING') {
                 router.push('/pending-approval');
-            } else {
-                switch (userData.role) {
-                    case 'ADMIN': router.push('/admin'); break;
-                    case 'DOCTOR': router.push('/doctor'); break;
-                    case 'PATIENT': router.push('/patient'); break;
-                    default: router.push('/patient');
-                }
+                return; // Stop execution to prevent routing to dashboard
+            }
+
+            switch (userData.role) {
+                case 'ADMIN': router.push('/admin'); break;
+                case 'DOCTOR': router.push('/doctor'); break;
+                case 'PATIENT': router.push('/patient'); break;
+                default: router.push('/patient');
             }
         } catch (error: any) {
             throw new Error(error.response?.data?.message || 'Login failed');
@@ -86,7 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, adminLogin, register, logout, isLoading }}>
+        <AuthContext.Provider value={{ user, login, adminLogin, register, logout, hydrateSession, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

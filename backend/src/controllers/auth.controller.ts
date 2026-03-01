@@ -55,3 +55,23 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
         message: 'Successfully logged out'
     });
 });
+
+export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
+    const { token } = req.query;
+
+    if (!token || typeof token !== "string") {
+        res.status(400).json({ success: false, message: "Invalid token format" });
+        return;
+    }
+
+    const result = await AuthServices.verifyEmail(token as string);
+
+    res.status(200).json(result);
+});
+
+export const resendVerification = asyncHandler(async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const result = await AuthServices.resendVerification(email);
+
+    res.status(200).json(result);
+});

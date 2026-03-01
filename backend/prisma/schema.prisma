@@ -25,6 +25,7 @@ model User {
   status     AccountStatus @default(PENDING)
   approvedBy String? // ID of AdminUser
   approvedAt DateTime?
+  emailVerified Boolean    @default(false)
 
   // Relations
   activityLogs         UserActivityLog[]
@@ -36,6 +37,7 @@ model User {
   prescriptions        Prescription[]            @relation("PatientPrescription")
   labReports           LabReport[]
   securityAlerts       SecurityAlert[]
+  verificationTokens   VerificationToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -110,8 +112,8 @@ model DoctorPatientAssignment {
   doctorId  String
   patientId String
 
-  doctor  User @relation("DoctorAssignment", fields: [doctorId], references: [id])
-  patient User @relation("PatientAssignment", fields: [patientId], references: [id])
+  doctor  User @relation("DoctorAssignment", fields: [doctorId], references: [id], onDelete: Cascade)
+  patient User @relation("PatientAssignment", fields: [patientId], references: [id], onDelete: Cascade)
 
   assignedAt DateTime @default(now())
 
@@ -124,7 +126,7 @@ model LabReport {
   reportUrl  String
   uploadedBy String?
 
-  patient User @relation(fields: [patientId], references: [id])
+  patient User @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -137,8 +139,8 @@ model Prescription {
   medication String
   dosage     String
 
-  patient User @relation("PatientPrescription", fields: [patientId], references: [id])
-  doctor  User @relation("DoctorPrescription", fields: [doctorId], references: [id])
+  patient User @relation("PatientPrescription", fields: [patientId], references: [id], onDelete: Cascade)
+  doctor  User @relation("DoctorPrescription", fields: [doctorId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -152,7 +154,7 @@ model AuditLog {
   ip        String?
   timestamp DateTime @default(now())
 
-  user User? @relation(fields: [userId], references: [id])
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserActivityLog {
@@ -164,7 +166,7 @@ model UserActivityLog {
   device    String?
   timestamp DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model SecurityAlert {
@@ -174,7 +176,7 @@ model SecurityAlert {
   reason    String
   resolved  Boolean @default(false)
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
@@ -208,4 +210,13 @@ model AnomalyLog {
   description String
 
   createdAt DateTime @default(now())
+}
+
+model VerificationToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

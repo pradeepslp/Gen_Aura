@@ -44,8 +44,8 @@ export default function RegisterPage() {
                     </div>
                     <h2 className="text-2xl font-bold font-display">Account Requested</h2>
                     <p className="text-slate-400 text-sm leading-relaxed">
-                        Your secure registration request has been submitted. An administrator will review
-                        your credentials and activate your zero-trust vault within 24 hours.
+                        A verification link has been sent to your email.
+                        Please verify your email before logging in. Your account will then await administrator authorization.
                     </p>
                     <Link href="/" className="block">
                         <Button variant="outline" className="w-full">Return Home</Button>
@@ -108,8 +108,8 @@ export default function RegisterPage() {
                                 type="button"
                                 onClick={() => setFormData({ ...formData, roleId: 'PATIENT' })}
                                 className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${formData.roleId === 'PATIENT'
-                                        ? 'bg-primary/10 border-primary text-primary'
-                                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                                    ? 'bg-primary/10 border-primary text-primary'
+                                    : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
                                     }`}
                             >
                                 <User className="h-4 w-4" />
@@ -119,8 +119,8 @@ export default function RegisterPage() {
                                 type="button"
                                 onClick={() => setFormData({ ...formData, roleId: 'DOCTOR' })}
                                 className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${formData.roleId === 'DOCTOR'
-                                        ? 'bg-primary/10 border-primary text-primary'
-                                        : 'bg-white/10 border-white/10 text-slate-400 hover:bg-white/20'
+                                    ? 'bg-primary/10 border-primary text-primary'
+                                    : 'bg-white/10 border-white/10 text-slate-400 hover:bg-white/20'
                                     }`}
                             >
                                 <Shield className="h-4 w-4" />
