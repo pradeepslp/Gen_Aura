@@ -66,7 +66,7 @@ export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
 
     const result = await AuthServices.verifyEmail(token as string);
 
-    res.status(200).json(result);
+    res.status(200).json({ success: true, data: result });
 });
 
 export const resendVerification = asyncHandler(async (req: Request, res: Response) => {
