@@ -126,4 +126,4 @@ The `prisma/seed.ts` script populates the database with the following active acc
 The frontend emphasizes a "Glassmorphism" aesthetic characterized by dark backgrounds, vibrant blue/emerald accent glows, translucent panels, and sleek backdrop-blur effects. This design evokes the feeling of interacting with a highly secure, state-of-the-art security terminal while remaining accessible and functional for daily clinical use.
 
 ## 📝 License
-This project is for demonstration and portfolio purposes. Do not use default credentials in a production environment.
+This project is for demonstration purposes. Do not use default credentials in a production environment.
