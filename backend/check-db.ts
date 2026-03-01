@@ -11,7 +11,7 @@ async function checkDoctors() {
             include: { role: true }
         });
 
-        const doctorUsers = users.filter(u => u.role.name === 'DOCTOR');
+        const doctorUsers = users.filter((u: any) => u.role.name === 'DOCTOR');
         console.log(`Found ${doctorUsers.length} user records with DOCTOR role.`);
     } catch (e) {
         console.error("Error querying db:", e);
