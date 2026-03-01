@@ -10,9 +10,21 @@ const app = express();
 // Security HTTP headers
 app.use(helmet());
 
-// Enable CORS
+// Enable CORS - support multiple origins (dev + production)
+const allowedOrigins = [
+    'http://localhost:3000',
+    ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',').map(o => o.trim()) : [])
+];
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like curl, Postman, or mobile apps)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error(`CORS blocked: origin ${origin} not allowed`));
+        }
+    },
     credentials: true
 }));
 
