@@ -12,7 +12,10 @@ const startServer = async () => {
     try {
         // 1. Connect Redis (non-blocking, gracefully skip if unavailable)
         try {
-            await connectRedis();
+            await Promise.race([
+                connectRedis(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Redis connection timeout')), 2000))
+            ]);
         } catch (err) {
             logger.warn('Redis unavailable, continuing without cache:', err);
         }
