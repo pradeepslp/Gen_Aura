@@ -87,11 +87,13 @@ export default function DoctorDashboard() {
                                     <div key={patient.id} className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors group">
                                         <div className="flex items-center gap-4">
                                             <div className="h-12 w-12 rounded-2xl bg-slate-800 border border-white/5 flex items-center justify-center text-primary font-bold shadow-lg">
-                                                {patient.email.substring(0, 2).toUpperCase()}
+                                                {patient.patientProfile?.firstName ? patient.patientProfile.firstName.substring(0, 1).toUpperCase() : patient.email.substring(0, 1).toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="text-white font-bold italic group-hover:text-primary transition-colors">{patient.email}</p>
-                                                <p className="text-[10px] text-slate-500 font-mono uppercase mt-0.5">UID: {patient.id.split('-')[0]}... • MEMBER SINCE {new Date(patient.createdAt).getFullYear()}</p>
+                                                <p className="text-white font-bold italic group-hover:text-primary transition-colors">
+                                                    {patient.patientProfile ? `${patient.patientProfile.firstName} ${patient.patientProfile.lastName}` : patient.email}
+                                                </p>
+                                                <p className="text-[10px] text-slate-500 font-mono uppercase mt-0.5">UID: {patient.id.split('-')[0]}... • MEMBER SINCE {new Date(patient.createdAt).getFullYear()} • {patient.email}</p>
                                             </div>
                                         </div>
                                         <div className="flex gap-2">

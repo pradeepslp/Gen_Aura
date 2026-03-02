@@ -80,4 +80,5 @@ export const patientApi = {
     getProfile: (patientId: string) => api.get(`/patients/${patientId}/profile`),
     getLabs: (patientId: string) => api.get(`/patients/${patientId}/labs`),
     getPrescriptions: (patientId: string) => api.get(`/patients/${patientId}/prescriptions`),
+    getAssignedDoctors: (patientId: string) => api.get(`/patients/${patientId}/doctors`),
 };

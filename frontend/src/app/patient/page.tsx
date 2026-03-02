@@ -79,9 +79,9 @@ export default function PatientDashboard() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {[
-                            { label: 'Heart Rate', value: '72', unit: 'bpm', status: 'Optimal', icon: Heart, color: 'text-red-500', bg: 'bg-red-500/10' },
-                            { label: 'Blood Pressure', value: '120/80', unit: 'mmHg', status: 'Normal', icon: Activity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                            { label: 'Blood Glucose', value: '5.4', unit: 'mmol/L', status: 'Good', icon: Dna, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                            { label: 'Heart Rate', value: profile?.vitals?.heartRate || '--', unit: 'bpm', status: profile?.vitals?.heartRate ? 'Recorded' : 'N/A', icon: Heart, color: 'text-red-500', bg: 'bg-red-500/10' },
+                            { label: 'Blood Pressure', value: profile?.vitals?.bloodPressure || '--/--', unit: 'mmHg', status: profile?.vitals?.bloodPressure ? 'Recorded' : 'N/A', icon: Activity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                            { label: 'Blood Glucose', value: profile?.vitals?.bloodGlucose || '--', unit: 'mmol/L', status: profile?.vitals?.bloodGlucose ? 'Recorded' : 'N/A', icon: Dna, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
                         ].map((vital, i) => (
                             <div key={i} className="glass p-6 rounded-3xl relative overflow-hidden group border border-white/5">
                                 <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 transition-transform">

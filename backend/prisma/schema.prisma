@@ -28,6 +28,8 @@ model User {
   emailVerified Boolean    @default(false)
 
   // Relations
+  patientProfile       Patient?
+  doctorProfile        Doctor?
   activityLogs         UserActivityLog[]
   auditLogs            AuditLog[]
   refreshTokens        RefreshToken[]
@@ -87,18 +89,22 @@ model RolePermission {
 }
 
 model Patient {
-  id           String   @id @default(uuid())
+  id           String   @id
+  user         User     @relation(fields: [id], references: [id], onDelete: Cascade)
   firstName    String
   lastName     String
   dateOfBirth  DateTime
   medicalNotes String? // Should be encrypted at app level
+
+  vitals       PatientVitals?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Doctor {
-  id             String @id @default(uuid())
+  id             String @id
+  user           User   @relation(fields: [id], references: [id], onDelete: Cascade)
   firstName      String
   lastName       String
   specialization String
@@ -106,6 +112,17 @@ model Doctor {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PatientVitals {
+  id            String   @id @default(uuid())
+  patientId     String   @unique
+  heartRate     String
+  bloodPressure String
+  bloodGlucose  String
+  updatedAt     DateTime @updatedAt
+
+  patient       Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
 }
 
 model DoctorPatientAssignment {

@@ -15,7 +15,8 @@ export const getMyPatients = asyncHandler(async (req: Request, res: Response) =>
                     id: true,
                     email: true,
                     status: true,
-                    createdAt: true
+                    createdAt: true,
+                    patientProfile: true
                 }
             }
         }

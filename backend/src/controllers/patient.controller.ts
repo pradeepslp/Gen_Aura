@@ -14,7 +14,8 @@ export const getPatientProfile = asyncHandler(async (req: Request, res: Response
             firstName: true,
             lastName: true,
             dateOfBirth: true,
-            medicalNotes: true // Simulated secure data
+            medicalNotes: true, // Simulated secure data
+            vitals: true
         }
     });
 
@@ -50,4 +51,31 @@ export const getPatientPrescriptions = asyncHandler(async (req: Request, res: Re
     await AuditService.log('VIEW_RECORD', `Prescriptions accessed for Patient: ${patientId}`, req.user.id, req.ip);
 
     res.status(200).json({ success: true, prescriptions });
+});
+
+export const getAssignedDoctors = asyncHandler(async (req: Request, res: Response) => {
+    const { patientId } = req.params;
+
+    const assignments = await prisma.doctorPatientAssignment.findMany({
+        where: { patientId },
+        include: {
+            doctor: {
+                include: {
+                    doctorProfile: true
+                }
+            }
+        }
+    });
+
+    const doctors = assignments.map((a: any) => ({
+        id: a.doctor.id,
+        email: a.doctor.email,
+        firstName: a.doctor.doctorProfile?.firstName,
+        lastName: a.doctor.doctorProfile?.lastName,
+        specialization: a.doctor.doctorProfile?.specialization
+    }));
+
+    await AuditService.log('VIEW_RECORD', `Assigned Doctors accessed for Patient: ${patientId}`, req.user.id, req.ip);
+
+    res.status(200).json({ success: true, doctors });
 });
