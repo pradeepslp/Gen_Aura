@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getPatientProfile, getPatientLabReports, getPatientPrescriptions, getAssignedDoctors } from '../controllers/patient.controller.js';
+import { getPatientProfile, getPatientLabReports, getPatientPrescriptions, getAssignedDoctors, getPatientDashboardData } from '../controllers/patient.controller.js';
 import { authenticateUser, checkAccountApproved } from '../middleware/auth.middleware.js';
 import { evaluateABACPatientAccess } from '../middleware/rbac.middleware.js';
 import { trackActivity } from '../middleware/anomaly.middleware.js';
@@ -39,6 +39,12 @@ router.get('/:patientId/doctors',
     evaluateABACPatientAccess,
     trackActivity('VIEW_RECORD', (req) => `AssignedDoctors-${req.params.patientId}`),
     getAssignedDoctors
+);
+
+router.get('/:patientId/dashboard',
+    evaluateABACPatientAccess,
+    trackActivity('VIEW_RECORD', (req) => `PatientDashboard-${req.params.patientId}`),
+    getPatientDashboardData
 );
 
 export default router;

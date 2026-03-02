@@ -33,9 +33,9 @@ app.use(express.json({ limit: '10kb' }));
 
 // Limit requests from same API
 const limiter = rateLimit({
-    max: 100, // 100 requests
-    windowMs: 60 * 60 * 1000, // 1 hour
-    message: 'Too many requests from this IP, please try again in an hour!'
+    max: 1000, // 1000 requests
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api', limiter);
 

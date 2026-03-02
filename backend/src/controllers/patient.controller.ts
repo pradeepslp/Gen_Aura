@@ -79,3 +79,36 @@ export const getAssignedDoctors = asyncHandler(async (req: Request, res: Respons
 
     res.status(200).json({ success: true, doctors });
 });
+
+export const getPatientDashboardData = asyncHandler(async (req: Request, res: Response) => {
+    const { patientId } = req.params;
+
+    const [patient, reports, prescriptions] = await Promise.all([
+        prisma.patient.findUnique({
+            where: { id: patientId },
+            include: { vitals: true }
+        }),
+        prisma.labReport.findMany({
+            where: { patientId },
+            orderBy: { createdAt: 'desc' }
+        }),
+        prisma.prescription.findMany({
+            where: { patientId },
+            include: { doctor: { select: { email: true } } },
+            orderBy: { createdAt: 'desc' }
+        })
+    ]);
+
+    if (!patient) throw new AppError('Patient not found', 404);
+
+    await AuditService.log('VIEW_RECORD', `Patient Dashboard consolidated access: ${patientId}`, req.user.id, req.ip);
+
+    res.status(200).json({
+        success: true,
+        data: {
+            patient,
+            reports,
+            prescriptions
+        }
+    });
+});

@@ -33,14 +33,11 @@ export default function PatientDashboard() {
 
         const fetchData = async () => {
             try {
-                const [profileRes, labsRes, presRes] = await Promise.all([
-                    patientApi.getProfile(user.id),
-                    patientApi.getLabs(user.id),
-                    patientApi.getPrescriptions(user.id)
-                ]);
-                setProfile(profileRes.data.patient);
-                setLabs(labsRes.data.reports);
-                setPrescriptions(presRes.data.prescriptions);
+                const res = await patientApi.getDashboardData(user.id);
+                const { patient, reports, prescriptions } = res.data.data;
+                setProfile(patient);
+                setLabs(reports);
+                setPrescriptions(prescriptions);
             } catch (error) {
                 console.error("Failed to fetch patient data", error);
             } finally {
