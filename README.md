@@ -119,10 +119,11 @@ The `prisma/seed.ts` script populates the database with the following active acc
 | Role | Login Portal | Email | Password |
 | :--- | :--- | :--- | :--- |
 | **System Admin** | `/admin/login` | `admin@securecare.local` | `AdminSecurePassword123!` |
-| **Doctor** | `/login` |  |  |
-| **Patient** | `/login` |  |  |
+| **Doctor** | `/login` | *Use your registered email* | *Your password* |
+| **Patient** | `/login` | *Use your registered email* | *Your password* |
 
-##"Use your email which is available in your device for login as doctor and patient"
+> [!NOTE]
+> Use your email which is available in your device for login as doctor and patient.
 
 ## 🎨 UI & Design Philosophy
 The frontend emphasizes a "Glassmorphism" aesthetic characterized by dark backgrounds, vibrant blue/emerald accent glows, translucent panels, and sleek backdrop-blur effects. This design evokes the feeling of interacting with a highly secure, state-of-the-art security terminal while remaining accessible and functional for daily clinical use.
