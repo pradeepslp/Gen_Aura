@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Shield, Mail, Lock, User, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Shield, Mail, Lock, User, ArrowRight, CheckCircle2, Activity } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { useAuth } from '@/context/AuthContext';
@@ -37,18 +37,18 @@ export default function RegisterPage() {
 
     if (step === 2) {
         return (
-            <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
-                <div className="w-full max-w-[440px] glass p-10 rounded-3xl text-center space-y-6">
-                    <div className="mx-auto h-16 w-16 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
-                        <CheckCircle2 className="h-8 w-8" />
+            <div className="min-h-screen flex items-center justify-center p-4 bg-white">
+                <div className="w-full max-w-[440px] glass p-10 rounded-3xl text-center space-y-6 border border-slate-100 shadow-xl shadow-slate-200/50 animate-in fade-in zoom-in-95 duration-500">
+                    <div className="mx-auto h-20 w-20 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                        <CheckCircle2 className="h-10 w-10" />
                     </div>
-                    <h2 className="text-2xl font-bold font-display">Account Requested</h2>
-                    <p className="text-slate-400 text-sm leading-relaxed">
+                    <h2 className="text-3xl font-bold font-display italic text-slate-900 line-clamp-1">Account Requested</h2>
+                    <p className="text-slate-500 text-sm leading-relaxed">
                         A verification link has been sent to your email.
                         Please verify your email before logging in. Your account will then await administrator authorization.
                     </p>
                     <Link href="/" className="block">
-                        <Button variant="outline" className="w-full">Return Home</Button>
+                        <Button className="w-full h-12 bg-primary text-white font-bold uppercase tracking-widest text-xs">Return Home</Button>
                     </Link>
                 </div>
             </div>
@@ -56,21 +56,22 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4 py-20">
-            <div className="absolute top-0 left-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-primary/5 blur-[100px]" />
+        <div className="min-h-screen flex items-center justify-center p-4 py-20 bg-white relative overflow-hidden">
+            <div className="absolute top-0 left-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-primary/10 blur-[100px]" />
 
-            <div className="w-full max-w-[480px] glass p-8 md:p-12 rounded-3xl animate-in fade-in zoom-in-95 duration-500">
+            <div className="w-full max-w-[480px] glass p-8 md:p-12 rounded-3xl animate-in fade-in zoom-in-95 duration-500 border border-slate-100 shadow-xl shadow-slate-200/50">
                 <div className="text-center mb-10">
                     <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20 mb-4">
                         <Shield className="h-6 w-6 text-primary" />
                     </div>
-                    <h1 className="text-2xl font-bold font-display">Join SecureCare</h1>
-                    <p className="text-slate-400 text-sm mt-2">Initialize your healthcare identity and access controls</p>
+                    <h1 className="text-3xl font-bold font-display italic text-slate-900">Join SecureCare</h1>
+                    <p className="text-slate-500 text-sm mt-2">Initialize your healthcare identity and access controls</p>
                 </div>
 
                 {error && (
-                    <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400">
-                        {error}
+                    <div className="mb-6 p-4 rounded-xl bg-red-50 text-[11px] text-red-600 border border-red-100 flex gap-2 items-center animate-shake">
+                        <CheckCircle2 className="h-4 w-4 shrink-0 rotate-180" />
+                        <p className="font-bold uppercase tracking-tight">{error}</p>
                     </div>
                 )}
 
@@ -82,6 +83,7 @@ export default function RegisterPage() {
                             value={formData.firstName}
                             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                             required
+                            className="bg-slate-50 border-slate-200 text-slate-900"
                         />
                         <Input
                             label="Last Name"
@@ -89,6 +91,7 @@ export default function RegisterPage() {
                             value={formData.lastName}
                             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                             required
+                            className="bg-slate-50 border-slate-200 text-slate-900"
                         />
                     </div>
 
@@ -99,32 +102,45 @@ export default function RegisterPage() {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         required
+                        icon={<Mail size={18} />}
+                        className="bg-slate-50 border-slate-200 text-slate-900"
                     />
 
                     <div className="space-y-4">
-                        <label className="text-xs font-medium text-slate-400">Account Type</label>
-                        <div className="grid grid-cols-2 gap-4">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Account Type</label>
+                        <div className="grid grid-cols-3 gap-2">
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, roleId: 'PATIENT' })}
-                                className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${formData.roleId === 'PATIENT'
-                                    ? 'bg-primary/10 border-primary text-primary'
-                                    : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl border transition-all ${formData.roleId === 'PATIENT'
+                                    ? 'bg-primary/10 border-primary text-primary shadow-sm'
+                                    : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100'
                                     }`}
                             >
                                 <User className="h-4 w-4" />
-                                <span className="text-sm">Patient</span>
+                                <span className="text-[10px] font-bold uppercase">Patient</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, roleId: 'DOCTOR' })}
-                                className={`flex items-center justify-center gap-2 p-3 rounded-xl border transition-all ${formData.roleId === 'DOCTOR'
-                                    ? 'bg-primary/10 border-primary text-primary'
-                                    : 'bg-white/10 border-white/10 text-slate-400 hover:bg-white/20'
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl border transition-all ${formData.roleId === 'DOCTOR'
+                                    ? 'bg-primary/10 border-primary text-primary shadow-sm'
+                                    : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100'
                                     }`}
                             >
                                 <Shield className="h-4 w-4" />
-                                <span className="text-sm">Doctor</span>
+                                <span className="text-[10px] font-bold uppercase">Doctor</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, roleId: 'LAB_TECHNICIAN' })}
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl border transition-all ${formData.roleId === 'LAB_TECHNICIAN'
+                                    ? 'bg-primary/10 border-primary text-primary shadow-sm'
+                                    : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100'
+                                    }`}
+                            >
+                                <Activity className="h-4 w-4" />
+                                <span className="text-[10px] font-bold uppercase text-center leading-tight">Lab Tech</span>
                             </button>
                         </div>
                     </div>
@@ -137,6 +153,8 @@ export default function RegisterPage() {
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             required
+                            icon={<Lock size={18} />}
+                            className="bg-slate-50 border-slate-200 text-slate-900"
                         />
                         <div className="grid grid-cols-4 gap-2 h-1 px-1">
                             <div className="rounded-full bg-primary" />
@@ -144,25 +162,25 @@ export default function RegisterPage() {
                             <div className="rounded-full bg-primary/20" />
                             <div className="rounded-full bg-primary/20" />
                         </div>
-                        <p className="text-[10px] text-slate-500 px-1">Security Strength: Medium | Use 12+ characters</p>
+                        <p className="text-[10px] text-slate-500 px-1 font-mono uppercase tracking-tighter">Security Strength: Medium | Use 12+ characters</p>
                     </div>
 
-                    <div className="rounded-xl border border-white/5 bg-white/5 p-4 flex gap-3 items-start">
+                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 flex gap-3 items-start">
                         <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                        <p className="text-xs text-slate-400 leading-relaxed">
-                            By registering, you agree to the <strong>HIPAA Data Processing Addendum</strong> and our
+                        <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                            By registering, you agree to the <strong className="text-slate-700">HIPAA Data Processing Addendum</strong> and our
                             Zero-Trust privacy protocols.
                         </p>
                     </div>
 
-                    <Button type="submit" className="w-full h-12" isLoading={isLoading}>
+                    <Button type="submit" className="w-full h-14 bg-primary text-white font-bold uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:opacity-90" isLoading={isLoading}>
                         Create Secure Account <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 </form>
 
-                <p className="text-center text-sm text-slate-400 mt-8">
+                <p className="text-center text-sm text-slate-500 mt-8">
                     Member already?{' '}
-                    <Link href="/login" className="text-primary font-medium hover:underline">
+                    <Link href="/login" className="text-primary font-bold hover:underline">
                         Login to access
                     </Link>
                 </p>

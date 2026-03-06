@@ -36,6 +36,12 @@ async function main() {
         create: { name: 'PATIENT', description: 'Healthcare Patient' }
     });
 
+    const labRole = await prisma.role.upsert({
+        where: { name: 'LAB_TECHNICIAN' },
+        update: {},
+        create: { name: 'LAB_TECHNICIAN', description: 'Laboratory Technician' }
+    });
+
     // 2. Create Permissions
     const permissions = [
         'view_patient_profiles',
@@ -74,6 +80,16 @@ async function main() {
             where: { roleId_permissionId: { roleId: patientRole.id, permissionId: pp.id } },
             update: {},
             create: { roleId: patientRole.id, permissionId: pp.id }
+        });
+    }
+
+    // Lab Technician gets view and upload
+    const labPerms = allPerms.filter((p: any) => ['view_patient_profiles', 'view_lab_reports', 'upload_lab_reports'].includes(p.name));
+    for (const lp of labPerms) {
+        await prisma.rolePermission.upsert({
+            where: { roleId_permissionId: { roleId: labRole.id, permissionId: lp.id } },
+            update: {},
+            create: { roleId: labRole.id, permissionId: lp.id }
         });
     }
 

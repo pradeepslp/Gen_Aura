@@ -3,13 +3,13 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: #3b82f6;
+  --color-primary: #30D5C8;
   --color-secondary: #64748b;
   --color-accent: #10b981;
   --color-destructive: #ef4444;
-  --color-border: #1e293b;
-  --color-card: #0a0a0a;
-  --color-card-foreground: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-card: #f8fafc;
+  --color-card-foreground: #0f172a;
 
   --radius-lg: 0.75rem;
   --radius-md: 0.5rem;
@@ -20,13 +20,13 @@
 }
 
 :root {
-  --background: #030405;
-  --foreground: #f8fafc;
-  --primary: #3b82f6;
-  --card: #0a0a0a;
-  --card-foreground: #f8fafc;
-  --border: #1e2a3b;
-  --ring: #3b82f6;
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --primary: #30D5C8;
+  --card: #f8fafc;
+  --card-foreground: #0f172a;
+  --border: #e2e8f0;
+  --ring: #30D5C8;
 }
 
 body {
@@ -45,20 +45,22 @@ h4,
 }
 
 .glass {
-  background: rgba(10, 10, 10, 0.7);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 .glass-accent {
-  background: rgba(59, 130, 246, 0.05);
+  background: rgba(48, 213, 200, 0.08);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(48, 213, 200, 0.2);
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+  background: linear-gradient(135deg, #30D5C8 0%, #10b981 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }

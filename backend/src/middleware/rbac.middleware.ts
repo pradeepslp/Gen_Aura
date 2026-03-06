@@ -52,6 +52,11 @@ export const evaluateABACPatientAccess = async (req: Request, res: Response, nex
             if (assignment) return next();
         }
 
+        // 3. Lab Technician can access patient profile and labs to upload reports
+        if (role === 'LAB_TECHNICIAN') {
+            return next();
+        }
+
         // For other restrictive queries - default Deny
         return next(new AppError('Attribute-Based Access Control blocked this request.', 403));
     } catch (err) {

@@ -34,9 +34,8 @@ api.interceptors.response.use(
                 localStorage.removeItem('user');
                 window.location.href = '/login';
             } else if (error.response?.status === 403) {
-                // Handle forbidden (e.g., account pending approval, role mismatch)
-                // This prevents infinite loops or broken components when the API rejects ABAC/RBAC
-                window.location.href = '/pending-approval';
+                // Let the components handle 403 or rely on ProtectedRoute
+                console.warn("Access forbidden (403):", error.response.data?.message);
             }
         }
         return Promise.reject(error);
@@ -66,14 +65,23 @@ export const adminApi = {
     resolveAlert: (alertId: string) => api.post(`/admin/security/alerts/${alertId}/resolve`),
     getAnomalyLogs: () => api.get('/admin/anomalies'),
     getAuditLogs: () => api.get('/admin/audit'),
+    getConfig: () => api.get('/admin/config'),
+    updateConfig: (data: any) => api.patch('/admin/config', data),
 };
 
 export const doctorApi = {
     getPatients: () => api.get('/doctors/patients'),
+    getPatientReports: (patientId: string) => api.get(`/doctors/patients/${patientId}/reports`),
     addPrescription: (data: { patientId: string; medication: string; dosage: string }) =>
         api.post('/doctors/prescriptions', data),
     uploadLab: (data: { patientId: string; reportUrl: string }) =>
         api.post('/doctors/labs', data),
+};
+
+export const labApi = {
+    getPatients: () => api.get('/lab/patients'),
+    uploadReport: (data: { patientId: string; reportUrl: string }) =>
+        api.post('/lab/upload', data),
 };
 
 export const patientApi = {
@@ -82,4 +90,17 @@ export const patientApi = {
     getPrescriptions: (patientId: string) => api.get(`/patients/${patientId}/prescriptions`),
     getAssignedDoctors: (patientId: string) => api.get(`/patients/${patientId}/doctors`),
     getDashboardData: (patientId: string) => api.get(`/patients/${patientId}/dashboard`),
+};
+
+export const triageApi = {
+    getSymptoms: () => api.get('/triage/symptoms'),
+    getQuestions: (symptomId: string) => api.get(`/triage/questions/${symptomId}`),
+    evaluate: (data: { symptomId: string; answers: string[] }) => api.post('/triage/evaluate', data),
+    getHistory: () => api.get('/triage/history'),
+};
+
+export const appointmentApi = {
+    book: (data: any) => api.post('/appointments/book', data),
+    getHistory: () => api.get('/appointments/history'),
+    getPatientAppointments: (patientId: string) => api.get(`/appointments/patient/${patientId}`),
 };

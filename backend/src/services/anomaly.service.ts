@@ -13,7 +13,10 @@ interface AnomalyData {
 export const AnomalyDetectionService = {
     async trackAndEvaluate(data: AnomalyData) {
         try {
-            // 1. Log to User Activity
+            // 0. Check global configuration
+            const config = await prisma.systemConfig.findUnique({ where: { id: 'singleton' } });
+
+            // 1. Log to User Activity (Always log activity even if engine is off)
             await prisma.userActivityLog.create({
                 data: {
                     userId: data.userId,
@@ -23,6 +26,10 @@ export const AnomalyDetectionService = {
                     device: data.device || 'unknown'
                 }
             });
+
+            if (config && !config.anomalyEngine) {
+                return; // Evaluation engine disabled globally
+            }
 
             // 2. Evaluate Rule-based Risks
             let riskScore = 0;
@@ -76,6 +83,17 @@ export const AnomalyDetectionService = {
                         userId: data.userId,
                         riskScore,
                         reason: reasonStr
+                    }
+                });
+
+                // Also create a persistent AnomalyLog for the Admin Dashboard
+                await prisma.anomalyLog.create({
+                    data: {
+                        type: data.action.replace(/_/g, ' '),
+                        description: `${reasonStr} while accessing ${data.resource}`,
+                        riskScore: riskScore,
+                        sensor: 'Security Engine',
+                        status: riskScore > 100 ? 'QUARANTINED' : riskScore > 50 ? 'CHALLENGED' : 'MONITORING'
                     }
                 });
 

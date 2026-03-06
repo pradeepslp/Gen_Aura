@@ -12,12 +12,16 @@ const startServer = async () => {
     try {
         // 1. Connect Redis (non-blocking, gracefully skip if unavailable)
         try {
-            await Promise.race([
-                connectRedis(),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Redis connection timeout')), 2000))
-            ]);
+            if (process.env.SKIP_REDIS !== 'true') {
+                await Promise.race([
+                    connectRedis(),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Redis connection timeout')), 2000))
+                ]);
+            } else {
+                logger.info('Redis connection skipped as per configuration.');
+            }
         } catch (err) {
-            logger.warn('Redis unavailable, continuing without cache:', err);
+            logger.warn('Redis unavailable, continuing without cache: Redis connection failed or timed out.');
         }
 
         // 2. Test Prisma Connection

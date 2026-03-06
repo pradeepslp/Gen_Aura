@@ -67,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             switch (userData.role) {
                 case 'ADMIN': router.push('/admin'); break;
                 case 'DOCTOR': router.push('/doctor'); break;
+                case 'LAB_TECHNICIAN': router.push('/lab-technician'); break;
                 case 'PATIENT': router.push('/patient'); break;
                 default: router.push('/patient');
             }

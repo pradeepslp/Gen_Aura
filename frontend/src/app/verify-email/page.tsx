@@ -26,13 +26,15 @@ function VerifyEmailContent() {
         }
 
         const verifyToken = async () => {
+            // Artificial delay to show off the loading animation
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
             try {
                 const response = await api.get(`/auth/verify-email?token=${token}`);
 
                 if (response.data?.success) {
                     const { tokens, user } = response.data.data;
 
-                    // If the backend provided tokens, the user is automatically logged in
                     if (tokens && user) {
                         localStorage.setItem('token', tokens.accessToken);
                         localStorage.setItem('user', JSON.stringify(user));
@@ -54,55 +56,106 @@ function VerifyEmailContent() {
         verifyToken();
     }, [token]);
 
+    const statusConfig = {
+        loading: {
+            color: 'primary',
+            icon: <Loader2 className="h-10 w-10 text-primary animate-spin" />,
+            title: 'Verifying Identity',
+            bgGlow: 'bg-primary/5'
+        },
+        success: {
+            color: 'emerald',
+            icon: <CheckCircle2 className="h-10 w-10 text-emerald-400" />,
+            title: 'Verification Complete',
+            bgGlow: 'bg-emerald-500/10'
+        },
+        error: {
+            color: 'red',
+            icon: <XCircle className="h-10 w-10 text-red-500" />,
+            title: 'Verification Failed',
+            bgGlow: 'bg-red-500/10'
+        }
+    };
+
+    const current = statusConfig[status];
+
     return (
-        <div className="w-full max-w-[440px] glass p-10 rounded-3xl text-center shadow-xl animate-in fade-in zoom-in-95 duration-500">
-            {status === 'loading' && (
-                <div className="flex flex-col items-center space-y-6">
-                    <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
-                        <Loader2 className="h-8 w-8 text-primary animate-spin" />
-                    </div>
-                    <h2 className="text-xl font-bold font-display text-white">Verifying Identity</h2>
-                    <p className="text-slate-400 text-sm leading-relaxed">{message}</p>
-                </div>
-            )}
+        <div className="relative w-full max-w-[480px]">
+            {/* Background Decorative Rings */}
+            <div className={`absolute inset-0 -z-10 blur-3xl opacity-30 transition-colors duration-1000 ${current.bgGlow}`} />
 
-            {status === 'success' && (
-                <div className="flex flex-col items-center space-y-6">
-                    <div className="mx-auto h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                        <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-                    </div>
-                    <h2 className="text-2xl font-bold font-display text-white">Verification Complete</h2>
-                    <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                        <p className="text-slate-300 text-sm leading-relaxed">{message}</p>
-                    </div>
-                    <div className="w-full pt-4">
-                        <Link href="/pending-approval" className="block w-full">
-                            <Button className="w-full h-12">Go to Your Account Status</Button>
-                        </Link>
-                    </div>
-                </div>
-            )}
+            <div className="glass p-1 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden group">
+                {/* Inner Card Glow/Reflection */}
+                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
 
-            {status === 'error' && (
-                <div className="flex flex-col items-center space-y-6">
-                    <div className="mx-auto h-16 w-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                        <XCircle className="h-8 w-8 text-red-500" />
+                <div className="bg-slate-900/60 backdrop-blur-xl rounded-[2.3rem] p-10 flex flex-col items-center space-y-8">
+                    {/* Status Icon */}
+                    <div className="relative">
+                        <div className={`absolute inset-0 blur-2xl opacity-40 animate-pulse ${status === 'success' ? 'bg-emerald-400' : status === 'error' ? 'bg-red-500' : 'bg-primary'
+                            }`} />
+                        <div className={`relative h-20 w-20 rounded-full border-2 flex items-center justify-center shadow-inner transition-colors duration-700 ${status === 'success' ? 'bg-emerald-500/10 border-emerald-500/30' :
+                                status === 'error' ? 'bg-red-500/10 border-red-500/30' :
+                                    'bg-primary/10 border-primary/30'
+                            }`}>
+                            {current.icon}
+                        </div>
                     </div>
-                    <h2 className="text-2xl font-bold font-display text-white">Verification Failed</h2>
-                    <div className="w-full p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-left flex gap-3 items-start">
-                        <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-                        <p className="text-red-200 text-sm leading-relaxed">{message}</p>
+
+                    {/* Text Section */}
+                    <div className="text-center space-y-3">
+                        <h2 className={`text-3xl font-black font-display tracking-tight text-white italic transition-all duration-700 ${status === 'success' ? 'text-emerald-400' : ''
+                            }`}>
+                            {current.title}
+                        </h2>
+                        <div className={`p-4 rounded-2xl border transition-all duration-700 ${status === 'success' ? 'bg-emerald-500/5 border-emerald-500/10 shadow-inner' :
+                                status === 'error' ? 'bg-red-500/5 border-red-500/10' :
+                                    'bg-primary/5 border-primary/10'
+                            }`}>
+                            {status === 'error' && (
+                                <AlertCircle className="h-5 w-5 text-red-500 mx-auto mb-2" />
+                            )}
+                            <p className="text-slate-300 text-sm font-medium leading-relaxed tracking-wide">
+                                {message}
+                            </p>
+                        </div>
                     </div>
-                    <div className="w-full pt-4 space-y-3">
-                        <Link href="/login" className="block w-full">
-                            <Button variant="outline" className="w-full h-12">Return to Login</Button>
-                        </Link>
-                        <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">
-                            Need a new link? <Link href="/login" className="text-primary hover:underline">Sign in</Link> to request another one.
-                        </p>
+
+                    {/* Actions */}
+                    <div className="w-full pt-4 animate-in slide-in-from-bottom-4 duration-1000">
+                        {status === 'success' ? (
+                            <Link href="/pending-approval" className="block w-full">
+                                <Button className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-emerald-500/20 group">
+                                    <span className="flex items-center justify-center gap-2">
+                                        Account Dashboard
+                                        <CheckCircle2 className="w-4 h-4 transition-transform group-hover:scale-125" />
+                                    </span>
+                                </Button>
+                            </Link>
+                        ) : status === 'error' ? (
+                            <div className="space-y-4 w-full">
+                                <Link href="/login" className="block w-full">
+                                    <Button variant="outline" className="w-full h-14 border-slate-700 text-white font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-white/5">
+                                        Return to Login
+                                    </Button>
+                                </Link>
+                                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black text-center">
+                                    Need help? Contact <span className="text-primary hover:underline cursor-pointer">Support</span>
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="h-14 flex items-center justify-center">
+                                <p className="text-[10px] text-slate-500 font-mono uppercase tracking-[0.3em] animate-pulse">
+                                    Authenticating Data Stream...
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
-            )}
+            </div>
+
+            {/* Bottom Accent */}
+            <div className={`h-1 mx-auto rounded-full blur-sm transition-all duration-1000 w-32 mt-6 ${status === 'success' ? 'bg-emerald-500' : status === 'error' ? 'bg-red-500' : 'bg-primary'
+                }`} />
         </div>
     );
 }
@@ -110,12 +163,15 @@ function VerifyEmailContent() {
 // Loading fallback for Suspense
 function VerifyEmailFallback() {
     return (
-        <div className="w-full max-w-[440px] glass p-10 rounded-3xl text-center shadow-xl">
-            <div className="flex flex-col items-center space-y-6">
-                <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
-                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <div className="w-full max-w-[480px] glass p-10 rounded-[2.5rem] text-center shadow-xl animate-pulse">
+            <div className="flex flex-col items-center space-y-8">
+                <div className="h-24 w-24 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center animate-spin">
+                    <Loader2 className="h-10 w-10 text-slate-600" />
                 </div>
-                <h2 className="text-xl font-bold font-display text-white">Loading...</h2>
+                <div className="space-y-4 w-full">
+                    <div className="h-8 bg-slate-800 rounded-lg w-3/4 mx-auto" />
+                    <div className="h-16 bg-slate-800 rounded-xl w-full" />
+                </div>
             </div>
         </div>
     );
@@ -124,8 +180,11 @@ function VerifyEmailFallback() {
 // Main page component wraps content in Suspense (required for useSearchParams)
 export default function VerifyEmailPage() {
     return (
-        <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
-            <div className="absolute top-0 left-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-primary/5 blur-[100px]" />
+        <div className="min-h-screen flex items-center justify-center p-6 bg-[#020617] relative overflow-hidden">
+            {/* Ambient Background Decorative Elements */}
+            <div className="absolute top-1/4 left-1/4 -z-20 h-96 w-96 rounded-full bg-primary/5 blur-[120px] animate-pulse" />
+            <div className="absolute bottom-1/4 right-1/4 -z-20 h-96 w-96 rounded-full bg-cyan-500/5 blur-[120px] animate-pulse delay-700" />
+
             <Suspense fallback={<VerifyEmailFallback />}>
                 <VerifyEmailContent />
             </Suspense>

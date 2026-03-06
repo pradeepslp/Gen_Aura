@@ -48,12 +48,18 @@ import authRoutes from './routes/auth.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import patientRoutes from './routes/patient.routes.js';
 import doctorRoutes from './routes/doctor.routes.js';
+import labRoutes from './routes/lab.routes.js';
+import triageRoutes from './routes/triage.routes.js';
+import appointmentRoutes from './routes/appointment.routes.js';
 
 // Routes will be added here
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/doctors', doctorRoutes);
+app.use('/api/lab', labRoutes);
+app.use('/api/triage', triageRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 // Handle unhandled routes
 app.use((req, res, next) => {

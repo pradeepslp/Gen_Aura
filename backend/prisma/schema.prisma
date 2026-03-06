@@ -30,6 +30,7 @@ model User {
   // Relations
   patientProfile       Patient?
   doctorProfile        Doctor?
+  labTechnicianProfile LabTechnician?
   activityLogs         UserActivityLog[]
   auditLogs            AuditLog[]
   refreshTokens        RefreshToken[]
@@ -40,6 +41,8 @@ model User {
   labReports           LabReport[]
   securityAlerts       SecurityAlert[]
   verificationTokens   VerificationToken[]
+  triageResults        TriageResult[]
+  appointments         Appointment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -109,6 +112,17 @@ model Doctor {
   lastName       String
   specialization String
   licenseNumber  String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LabTechnician {
+  id        String @id
+  user      User   @relation(fields: [id], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  employeeId String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -219,14 +233,13 @@ model AdminRefreshToken {
 }
 
 model AnomalyLog {
-  id          String @id @default(uuid())
+  id          String   @id @default(uuid())
   sensor      String
   type        String
   riskScore   Int
   status      String
   description String
-
-  createdAt DateTime @default(now())
+  createdAt   DateTime @default(now())
 }
 
 model VerificationToken {
@@ -234,6 +247,96 @@ model VerificationToken {
   token     String   @unique
   userId    String
   expiresAt DateTime
-
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// --- Symptom Triage Models ---
+
+model Symptom {
+  id        String           @id @default(uuid())
+  name      String           @unique
+  questions TriageQuestion[]
+  results   TriageResult[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TriageQuestion {
+  id        String         @id @default(uuid())
+  symptomId String
+  text      String
+  symptom   Symptom        @relation(fields: [symptomId], references: [id], onDelete: Cascade)
+  answers   TriageAnswer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TriageAnswer {
+  id         String         @id @default(uuid())
+  questionId String
+  text       String
+  score      Int            // Used for triage scoring
+  question   TriageQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TriageResult {
+  id                    String   @id @default(uuid())
+  patientId             String
+  symptomId             String
+  totalScore            Int
+  riskLevel             String   // e.g., 'Low', 'Moderate', 'High', 'Emergency'
+  recommendedSpecialist String   // e.g., 'General Physician', 'Cardiologist'
+  patient               User     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  symptom               Symptom  @relation(fields: [symptomId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model SystemConfig {
+  id                String   @id @default("singleton")
+  mfaEnabled        Boolean  @default(true)
+  sessionTimeout    Int      @default(15)
+  jwtExpiry         String   @default("15m")
+  strictAudit       Boolean  @default(false)
+  logRetention      Int      @default(2190)
+  phiRedaction      String   @default("Full Redaction")
+  anomalyEngine     Boolean  @default(true)
+  lockoutThreshold  Int      @default(5)
+  updatedAt         DateTime @updatedAt
+}
+
+model Appointment {
+  id                 String   @id @default(uuid())
+  patientId          String
+  patient            User     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  // Personal Details
+  fullName           String
+  age                String
+  gender             String
+  contactNumber      String
+  address            String
+
+  // Chief Complaint
+  chiefComplaint     String[] // Fever, Headache, Chest pain, Stomach pain, Others
+  complaintDetails   String?  // For "Others" or additional info
+
+  // Medical History
+  medicalHistory     String[] // Diabetes, Blood Pressure, Asthma, Heart disease, Previous surgeries, Others
+  historyDetails     String?  // For "Others" or additional info
+
+  // Current Medications
+  currentMedications String[] // BP tablets, Diabetes tablets, Pain killers, Others
+  medicationDetails  String?  // For "Others" or additional info
+
+  status             String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED, COMPLETED
+  
+  appointmentDate    DateTime @default(now()) // Placeholder for actual scheduling if needed
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }

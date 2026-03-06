@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getPendingUsers, getAllUsers, approveUser, unauthorizeUser, rejectUser, deleteUser, getSecurityAlerts, resolveSecurityAlert, getDashboardStats, getAnomalyLogs, getAuditLogs } from '../controllers/admin.controller.js';
+import { getPendingUsers, getAllUsers, approveUser, unauthorizeUser, rejectUser, deleteUser, getSecurityAlerts, resolveSecurityAlert, getDashboardStats, getAnomalyLogs, getAuditLogs, getSystemConfig, updateSystemConfig } from '../controllers/admin.controller.js';
 import { authenticateAdmin } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -23,5 +23,9 @@ router.get('/security/alerts', getSecurityAlerts);
 router.post('/security/alerts/:alertId/resolve', resolveSecurityAlert);
 router.get('/anomalies', getAnomalyLogs);
 router.get('/audit', getAuditLogs);
+
+// System Configuration
+router.get('/config', getSystemConfig);
+router.patch('/config', updateSystemConfig);
 
 export default router;

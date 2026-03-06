@@ -106,6 +106,21 @@ export const AuthServices = {
             } catch (err) {
                 console.error("Failed to create Doctor record:", err);
             }
+        } else if (newUser.role.name === 'LAB_TECHNICIAN') {
+            console.log("Entering Lab Technician creation block for user:", newUser.id);
+            try {
+                const labTech = await prisma.labTechnician.create({
+                    data: {
+                        id: newUser.id,
+                        firstName: data.firstName || 'Lab',
+                        lastName: data.lastName || 'Technician',
+                        employeeId: `LAB-${Math.random().toString(36).substring(7).toUpperCase()}`
+                    }
+                });
+                console.log("Successfully created Lab Technician record:", labTech);
+            } catch (err) {
+                console.error("Failed to create Lab Technician record:", err);
+            }
         }
 
         // 6. Generate and store verification token

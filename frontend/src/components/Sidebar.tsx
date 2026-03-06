@@ -1,3 +1,6 @@
+"use client";
+
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -48,7 +51,7 @@ export const Sidebar = () => {
     const menuItems = menuItemsByRole[role] || menuItemsByRole.PATIENT;
 
     return (
-        <div className="fixed left-0 top-16 hidden h-[calc(100vh-64px)] w-64 border-r border-white/5 bg-black/40 backdrop-blur-xl md:block">
+        <div className="fixed left-0 top-16 hidden h-[calc(100vh-64px)] w-64 border-r border-slate-200 bg-white backdrop-blur-xl md:block shadow-sm">
             <div className="flex h-full flex-col p-4">
                 <div className="space-y-1">
                     {menuItems.map((item) => (
@@ -56,13 +59,13 @@ export const Sidebar = () => {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all hover:bg-white/5 group',
-                                pathname === item.href ? 'bg-primary/10 text-primary' : 'text-slate-400 hover:text-white'
+                                'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all hover:bg-slate-50 group uppercase tracking-widest text-[10px]',
+                                pathname === item.href ? 'bg-primary/10 text-primary border border-primary/10' : 'text-slate-500 hover:text-slate-900'
                             )}
                         >
                             <item.icon className={cn(
-                                'h-5 w-5 transition-transform group-hover:scale-110',
-                                pathname === item.href ? 'text-primary' : 'text-slate-500 group-hover:text-white'
+                                'h-4 w-4 transition-transform group-hover:scale-110',
+                                pathname === item.href ? 'text-primary' : 'text-slate-400 group-hover:text-primary'
                             )} />
                             {item.label}
                         </Link>
@@ -70,16 +73,16 @@ export const Sidebar = () => {
                 </div>
 
                 <div className="mt-auto p-2">
-                    <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+                    <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 shadow-sm">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
                                 <ShieldAlert className="h-4 w-4 text-primary" />
                             </div>
-                            <span className="text-xs font-bold text-primary italic uppercase tracking-widest">Zero-Trust Active</span>
+                            <span className="text-[10px] font-bold text-primary italic uppercase tracking-widest">Zero-Trust Active</span>
                         </div>
-                        <p className="text-[10px] text-slate-400 leading-relaxed font-mono">
+                        <p className="text-[10px] text-slate-500 leading-relaxed font-mono font-medium truncate">
                             {user?.email}<br />
-                            <span className="opacity-50">NODE: AP-SOUTH-1</span>
+                            <span className="opacity-60">NODE: AP-SOUTH-1</span>
                         </p>
                     </div>
                 </div>

@@ -1,18 +1,16 @@
 import { Router } from 'express';
-import { getAllPatients, addPrescription, uploadLabReport, getPatientReports } from '../controllers/doctor.controller.js';
+import { getAllPatients, uploadReport } from '../controllers/lab.controller.js';
 import { authenticateUser, checkAccountApproved } from '../middleware/auth.middleware.js';
 import { checkRole } from '../middleware/rbac.middleware.js';
 
 const router = Router();
 
-// Secure Doctor routes
+// Secure Lab Technician routes
 router.use(authenticateUser);
 router.use(checkAccountApproved);
-router.use(checkRole('DOCTOR'));
+router.use(checkRole('LAB_TECHNICIAN'));
 
 router.get('/patients', getAllPatients);
-router.get('/patients/:patientId/reports', getPatientReports);
-router.post('/prescriptions', addPrescription);
-router.post('/labs', uploadLabReport);
+router.post('/upload', uploadReport);
 
 export default router;

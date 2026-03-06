@@ -206,3 +206,29 @@ export const getDashboardStats = asyncHandler(async (req: Request, res: Response
         throw error;
     }
 });
+
+export const getSystemConfig = asyncHandler(async (req: Request, res: Response) => {
+    const config = await prisma.systemConfig.findUnique({
+        where: { id: 'singleton' }
+    });
+
+    if (!config) throw new AppError('System configuration not found', 404);
+
+    res.status(200).json({ success: true, config });
+});
+
+export const updateSystemConfig = asyncHandler(async (req: Request, res: Response) => {
+    const configData = req.body;
+
+    // Filter out ID to prevent accidental changes to singleton key
+    const { id, ...updateData } = configData;
+
+    const updatedConfig = await prisma.systemConfig.update({
+        where: { id: 'singleton' },
+        data: updateData
+    });
+
+    await AuditService.log('SYSTEM_CONFIG_UPDATED', `Admin ${req.admin.id} updated global system configuration`, undefined, (req.ip as string) || 'unknown');
+
+    res.status(200).json({ success: true, message: 'Configuration updated successfully', config: updatedConfig });
+});
