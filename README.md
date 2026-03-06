@@ -123,7 +123,7 @@ The `prisma/seed.ts` script populates the database with the following active acc
 | **Patient** | `/login` | *Use your registered email* | *Your password* |
 
 > [!NOTE]
-> Use your email which is available in your device for login as doctor and patient.
+> Use your email which is available in your device for login as doctor, patient and lab-technician.
 
 ## 🎨 UI & Design Philosophy
 The frontend emphasizes a "Glassmorphism" aesthetic characterized by dark backgrounds, vibrant blue/emerald accent glows, translucent panels, and sleek backdrop-blur effects. This design evokes the feeling of interacting with a highly secure, state-of-the-art security terminal while remaining accessible and functional for daily clinical use.
