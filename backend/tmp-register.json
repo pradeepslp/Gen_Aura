@@ -1,0 +1,7 @@
+{
+    "firstName": "Test",
+    "lastName": "Lab",
+    "email": "testlab5@example.com",
+    "password": "SecurePassword123!",
+    "roleId": "LAB_TECHNICIAN"
+}

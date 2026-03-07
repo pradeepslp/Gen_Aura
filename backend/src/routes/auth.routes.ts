@@ -13,7 +13,6 @@ router.post('/refresh-token', validateRequest(refreshTokenSchema), refreshToken)
 router.post('/logout', logout);
 router.get('/verify-email', verifyEmail);
 router.post('/resend-verification', validateRequest(resendVerificationSchema), resendVerification);
-router.post('/resend-verification', validateRequest(resendVerificationSchema), resendVerification);
 router.get('/me', authenticateUser, (req, res) => {
     // Current authenticated user is attached to req.user by authenticateUser middleware
     res.status(200).json({
@@ -24,7 +23,8 @@ router.get('/me', authenticateUser, (req, res) => {
                 email: req.user.email,
                 role: req.user.role.name,
                 status: req.user.status,
-                emailVerified: req.user.emailVerified
+                emailVerified: req.user.emailVerified,
+                profile: req.user.doctorProfile || req.user.patientProfile || req.user.labTechnicianProfile || null
             }
         }
     });
