@@ -29,8 +29,8 @@ export const Navbar = () => {
                         </button>
                     )}
                     <Link href="/" className="flex items-center gap-2 group">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 group-hover:border-primary/50 transition-all text-primary">
-                            <Shield className="h-5 w-5" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/5 group-hover:bg-primary/10 transition-all overflow-hidden border border-transparent group-hover:border-primary/20">
+                            <img src="/vercel.svg" alt="SecureCare" className="h-8 w-8 object-contain" />
                         </div>
                         <span className="text-lg font-bold tracking-tight text-slate-900">
                             Secure<span className="text-primary">Care</span>

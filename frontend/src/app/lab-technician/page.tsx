@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/Button';
 import { labApi } from '@/lib/api';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { StaffTaskBoard } from '@/components/workflow';
 
 export default function LabTechnicianDashboard() {
     const [patients, setPatients] = useState<any[]>([]);
@@ -114,6 +115,11 @@ export default function LabTechnicianDashboard() {
                                 </div>
                             ))}
                         </div>
+                    </div>
+
+                    {/* Inter-Department Workflow Queue */}
+                    <div className="mt-8">
+                        <StaffTaskBoard />
                     </div>
                 </div>
             </div>

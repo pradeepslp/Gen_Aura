@@ -16,8 +16,9 @@ export const redisClient = createClient({
 
 let isRedisSuppressed = false;
 
-redisClient.on('error', (err) => {
-    if (!isRedisSuppressed) {
+redisClient.on('error', (err: any) => {
+    // Only log if not suppressed AND if it's not a common "ECONNREFUSED" when we intended to skip
+    if (!isRedisSuppressed && process.env.SKIP_REDIS !== 'true') {
         logger.error('Redis Client Error', err);
     }
 });

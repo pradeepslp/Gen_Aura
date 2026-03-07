@@ -16,6 +16,29 @@ enum AccountStatus {
   REJECTED
 }
 
+enum WorkflowCategory {
+  CONSULTATION
+  LAB_TEST
+  PHARMACY
+  REFERRAL
+  OTHER
+}
+
+enum WorkflowStatus {
+  OPEN
+  IN_PROGRESS
+  TRANSFERRED
+  COMPLETED
+  CANCELLED
+}
+
+enum WorkflowPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
 model User {
   id         String        @id @default(uuid())
   email      String        @unique
@@ -42,7 +65,14 @@ model User {
   securityAlerts       SecurityAlert[]
   verificationTokens   VerificationToken[]
   triageResults        TriageResult[]
-  appointments         Appointment[]
+  appointments         Appointment[]             @relation("PatientAppointments")
+  doctorAppointments   Appointment[]             @relation("DoctorAppointments")
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  
+  workflowRequests WorkflowRequest[] @relation("PatientWorkflow")
+  workflowActions  WorkflowStep[]    @relation("ActorWorkflow")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -313,8 +343,11 @@ model SystemConfig {
 model Appointment {
   id                 String   @id @default(uuid())
   patientId          String
-  patient            User     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patient            User     @relation("PatientAppointments", fields: [patientId], references: [id], onDelete: Cascade)
   
+  doctorId           String?
+  doctor             User?    @relation("DoctorAppointments", fields: [doctorId], references: [id])
+
   // Personal Details
   fullName           String
   age                String
@@ -339,4 +372,58 @@ model Appointment {
   appointmentDate    DateTime @default(now()) // Placeholder for actual scheduling if needed
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+}
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  staff       User[]
+  
+  fromSteps   WorkflowStep[] @relation("FromDept")
+  toSteps     WorkflowStep[] @relation("ToDept")
+  requests    WorkflowRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkflowRequest {
+  id          String           @id @default(uuid())
+  patientId   String
+  patient     User             @relation("PatientWorkflow", fields: [patientId], references: [id])
+  
+  category    WorkflowCategory
+  title       String
+  description String
+  priority    WorkflowPriority @default(MEDIUM)
+  status      WorkflowStatus   @default(OPEN)
+  
+  currentDeptId String
+  currentDept   Department     @relation(fields: [currentDeptId], references: [id])
+  
+  steps       WorkflowStep[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkflowStep {
+  id          String   @id @default(uuid())
+  requestId   String
+  request     WorkflowRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  
+  fromDeptId  String?
+  fromDept    Department? @relation("FromDept", fields: [fromDeptId], references: [id])
+  
+  toDeptId    String
+  toDept      Department  @relation("ToDept", fields: [toDeptId], references: [id])
+  
+  actorId     String
+  actor       User @relation("ActorWorkflow", fields: [actorId], references: [id])
+  
+  actionTaken String
+  comments    String?
+  
+  createdAt DateTime @default(now())
 }

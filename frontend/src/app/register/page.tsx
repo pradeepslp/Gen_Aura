@@ -145,6 +145,27 @@ export default function RegisterPage() {
                         </div>
                     </div>
 
+                    {formData.roleId === 'DOCTOR' && (
+                        <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Medical Specialization</label>
+                            <select
+                                className="w-full h-14 px-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium italic"
+                                value={(formData as any).specialization || ""}
+                                onChange={(e) => setFormData({ ...formData, ['specialization' as any]: e.target.value })}
+                                required
+                            >
+                                <option value="" disabled>Select your specialty</option>
+                                <option value="Cardiologist">Cardiologist</option>
+                                <option value="Neurologist">Neurologist</option>
+                                <option value="Oncologist">Oncologist</option>
+                                <option value="Gastroenterologist">Gastroenterologist</option>
+                                <option value="Endocrinologist">Endocrinologist</option>
+                                <option value="Pediatrician">Pediatrician</option>
+                                <option value="Ophthalmologist">Ophthalmologist</option>
+                            </select>
+                        </div>
+                    )}
+
                     <div className="space-y-4">
                         <Input
                             label="Password"

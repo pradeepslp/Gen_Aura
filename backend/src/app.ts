@@ -13,6 +13,11 @@ app.use(helmet());
 // Enable CORS - support multiple origins (dev + production)
 const allowedOrigins = [
     'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:3002',
     ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',').map(o => o.trim()) : [])
 ];
 
@@ -22,10 +27,13 @@ app.use(cors({
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            console.error(`[CORS] Rejected origin: ${origin}`);
             callback(new Error(`CORS blocked: origin ${origin} not allowed`));
         }
     },
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Body parser, reading data from body into req.body
@@ -51,6 +59,7 @@ import doctorRoutes from './routes/doctor.routes.js';
 import labRoutes from './routes/lab.routes.js';
 import triageRoutes from './routes/triage.routes.js';
 import appointmentRoutes from './routes/appointment.routes.js';
+import workflowRoutes from './routes/workflow.routes.js';
 
 // Routes will be added here
 app.use('/api/auth', authRoutes);
@@ -60,6 +69,7 @@ app.use('/api/doctors', doctorRoutes);
 app.use('/api/lab', labRoutes);
 app.use('/api/triage', triageRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/workflow', workflowRoutes);
 
 // Handle unhandled routes
 app.use((req, res, next) => {

@@ -15,7 +15,8 @@ export const getPendingUsers = asyncHandler(async (req: Request, res: Response) 
             email: true,
             status: true,
             createdAt: true,
-            role: { select: { name: true } }
+            role: { select: { name: true } },
+            doctorProfile: { select: { specialization: true } }
         }
     });
 
@@ -30,7 +31,8 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
             email: true,
             status: true,
             createdAt: true,
-            role: { select: { name: true } }
+            role: { select: { name: true } },
+            doctorProfile: { select: { specialization: true } }
         },
         orderBy: { createdAt: 'desc' }
     });

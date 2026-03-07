@@ -13,11 +13,12 @@ export const checkRole = (...roles: string[]) => {
 
 export const checkPermission = (requiredPermission: string) => {
     return (req: Request, res: Response, next: NextFunction) => {
-        if (!req.user) {
+        if (!req.user || !req.user.role) {
             return next(new AppError('Unauthorized', 401));
         }
 
-        const permissions = req.user.role.rolePermissions.map((rp: any) => rp.permission.name);
+        const rolePermissions = req.user.role.rolePermissions || [];
+        const permissions = rolePermissions.map((rp: any) => rp.permission?.name).filter(Boolean);
 
         if (!permissions.includes(requiredPermission)) {
             return next(new AppError(`Forbidden: Missing permission ${requiredPermission}`, 403));

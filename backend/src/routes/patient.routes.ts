@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getPatientProfile, getPatientLabReports, getPatientPrescriptions, getAssignedDoctors, getPatientDashboardData } from '../controllers/patient.controller.js';
+import { getPatientProfile, getPatientLabReports, getPatientPrescriptions, getAssignedDoctors, getPatientDashboardData, getAllDoctors } from '../controllers/patient.controller.js';
 import { authenticateUser, checkAccountApproved } from '../middleware/auth.middleware.js';
 import { evaluateABACPatientAccess } from '../middleware/rbac.middleware.js';
 import { trackActivity } from '../middleware/anomaly.middleware.js';
@@ -15,7 +15,8 @@ router.use(trackActivity('API_ACCESS', (req) => req.originalUrl));
 
 // Patient Endpoint Protection with ABAC Layer
 // Only allow access if user is either the assigned Doctor or the Patient themselves
-// The :patientId is required in the path for the ABAC validation 
+
+router.get('/doctors/all', getAllDoctors);
 
 router.get('/:patientId/profile',
     evaluateABACPatientAccess,

@@ -93,6 +93,9 @@ export default function AdminUsersPage() {
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-slate-900 italic group-hover:text-primary transition-colors">{user.email}</p>
+                                                {user.role?.name === 'DOCTOR' && user.doctorProfile?.specialization && (
+                                                    <p className="text-[10px] text-primary font-bold uppercase tracking-widest mt-0.5">{user.doctorProfile.specialization}</p>
+                                                )}
                                             </div>
                                         </div>
                                     </td>

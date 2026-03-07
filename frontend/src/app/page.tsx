@@ -10,8 +10,8 @@ export default function HomePage() {
         <div className="absolute top-0 left-1/2 -z-10 h-[800px] w-[800px] -translate-x-1/2 rounded-full bg-primary/10 blur-[120px]" />
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mb-8 animate-fade-in">
-            <Shield className="h-4 w-4" />
+          <div className="inline-flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 pl-1 pr-4 py-1.5 text-sm font-medium text-primary mb-8 animate-fade-in group hover:bg-primary/10 transition-all cursor-default">
+            <img src="/vercel.svg" alt="SecureCare" className="h-6 w-6" />
             <span className="text-[10px] font-bold uppercase tracking-widest">Standardized Healthcare Security v1.0</span>
           </div>
 
@@ -136,9 +136,9 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="py-16 border-t border-slate-100 text-center space-y-6 bg-slate-50/50">
         <div className="mx-auto max-w-7xl px-4 flex flex-col items-center">
-          <div className="flex items-center gap-2 mb-4">
-            <Shield className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold tracking-tight text-slate-900">Secure<span className="text-primary">Care</span></span>
+          <div className="flex items-center gap-3 mb-6">
+            <img src="/vercel.svg" alt="SecureCare Logo" className="h-10 w-10" />
+            <span className="text-2xl font-bold tracking-tight text-slate-900">Secure<span className="text-primary">Care</span></span>
           </div>
           <p className="text-slate-500 text-sm italic max-w-md mb-8">
             Protecting healthcare data with advanced zero-trust protocols and real-time monitoring.

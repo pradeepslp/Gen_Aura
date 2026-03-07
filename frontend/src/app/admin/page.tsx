@@ -127,7 +127,12 @@ export default function AdminDashboard() {
                                         </div>
                                         <div>
                                             <p className="font-bold text-slate-900 italic group-hover:text-primary transition-colors">{user.email}</p>
-                                            <p className="text-[10px] text-slate-500 font-mono uppercase tracking-tighter mt-1">{user.role?.name || 'USER'}</p>
+                                            <p className="text-[10px] text-slate-500 font-mono uppercase tracking-tighter mt-1">
+                                                {user.role?.name || 'USER'}
+                                                {user.role?.name === 'DOCTOR' && user.doctorProfile?.specialization && (
+                                                    <span className="text-primary font-bold ml-2">• {user.doctorProfile.specialization}</span>
+                                                )}
+                                            </p>
                                         </div>
                                     </div>
                                     <div className="flex gap-3">

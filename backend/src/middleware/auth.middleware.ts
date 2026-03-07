@@ -22,24 +22,38 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
         }
 
         if (!token) {
+            console.log('Auth failed: No token provided');
             return next(new AppError('You are not logged in! Please log in to get access.', 401));
         }
 
-        const decoded = verifyUserAccessToken(token) as any;
+        try {
+            const decoded = verifyUserAccessToken(token) as any;
+            console.log('Auth: Token decoded successfully', { id: decoded.id });
 
-        const currentUser = await prisma.user.findUnique({
-            where: { id: decoded.id },
-            include: { role: { include: { rolePermissions: { include: { permission: true } } } } }
-        });
+            const currentUser = await prisma.user.findUnique({
+                where: { id: decoded.id },
+                include: {
+                    role: { include: { rolePermissions: { include: { permission: true } } } },
+                    doctorProfile: true,
+                    patientProfile: true,
+                    labTechnicianProfile: true
+                }
+            });
 
-        if (!currentUser) {
-            return next(new AppError('The user belonging to this token does no longer exist.', 401));
+            if (!currentUser) {
+                console.log('Auth failed: User not found for ID', decoded.id);
+                return next(new AppError('The user belonging to this token does no longer exist.', 401));
+            }
+
+            // Attach user securely to request
+            req.user = currentUser;
+            next();
+        } catch (jwtErr) {
+            console.log('Auth failed: Token verification failed', jwtErr);
+            return next(new AppError('Invalid token!', 401));
         }
-
-        // Attach user securely to request
-        req.user = currentUser;
-        next();
     } catch (err) {
+        console.error('Auth middleware unexpected error:', err);
         next(err);
     }
 };

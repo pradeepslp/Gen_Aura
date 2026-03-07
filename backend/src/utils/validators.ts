@@ -7,6 +7,7 @@ export const registerSchema = z.object({
         firstName: z.string().min(1, 'First name is required'),
         lastName: z.string().min(1, 'Last name is required'),
         roleId: z.string().min(1, 'Role ID is required'),
+        specialization: z.string().optional(),
     }),
 });
 

@@ -15,9 +15,12 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { doctorApi } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { StaffTaskBoard } from '@/components/workflow';
 
 export default function DoctorDashboard() {
+    const { user } = useAuth();
     const [patients, setPatients] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -54,7 +57,7 @@ export default function DoctorDashboard() {
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold font-display tracking-tight italic underline decoration-primary/30 underline-offset-8 decoration-2 text-slate-900">Clinical Portal</h1>
-                        <p className="text-slate-500 mt-2 font-mono uppercase tracking-widest text-xs">Patient Identity & Clinical Record Management</p>
+                        <p className="text-slate-500 mt-2 font-mono uppercase tracking-widest text-[10px]">Consultant: <span className="text-primary font-bold">Dr. {user?.profile?.lastName || 'Medical Staff'}</span> | Specialization: <span className="text-slate-700 font-bold">{user?.profile?.specialization || 'Clinical Operations'}</span></p>
                     </div>
                     <div className="flex gap-3">
                         <div className="relative">
@@ -159,6 +162,10 @@ export default function DoctorDashboard() {
                     </div>
                 </div>
             </div>
+
+            <section className="mt-12 max-w-7xl mx-auto px-4 md:px-8">
+                <StaffTaskBoard />
+            </section>
         </ProtectedRoute>
     );
 }

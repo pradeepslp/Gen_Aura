@@ -1,6 +1,7 @@
 import prisma from '../utils/prisma.js';
 import bcrypt from 'bcrypt';
 import { AppError } from '../utils/errors.js';
+import logger from '../utils/logger.js';
 import {
     signUserAccessToken,
     signUserRefreshToken,
@@ -98,7 +99,7 @@ export const AuthServices = {
                         id: newUser.id,
                         firstName: data.firstName || 'Doctor',
                         lastName: data.lastName || 'Professional',
-                        specialization: 'General Medicine', // Default for self-reg
+                        specialization: data.specialization || 'General Medicine',
                         licenseNumber: `LIC-${Math.random().toString(36).substring(7).toUpperCase()}`
                     }
                 });
@@ -148,12 +149,20 @@ export const AuthServices = {
     async loginUser(data: any, ip: string, device: string) {
         const user = await prisma.user.findUnique({
             where: { email: data.email },
-            include: { role: true },
+            include: {
+                role: true,
+                doctorProfile: true,
+                patientProfile: true,
+                labTechnicianProfile: true
+            },
         });
 
         if (!user || !(await bcrypt.compare(data.password, user.password))) {
+            logger.warn(`Login failed: Invalid credentials for user ${data.email} from IP: ${ip}`);
             throw new AppError('Invalid credentials', 401);
         }
+
+        logger.info(`User ${data.email} logged in successfully from IP: ${ip} on device: ${device}`);
 
         // Removed hard block: allow login to proceed so frontend can route to /pending-approval and show correct message dựa on emailVerified
 
@@ -171,7 +180,18 @@ export const AuthServices = {
             }
         });
 
-        return { user: { id: user.id, email: user.email, status: user.status, role: user.role.name, emailVerified: user.emailVerified }, accessToken, refreshToken };
+        return {
+            user: {
+                id: user.id,
+                email: user.email,
+                status: user.status,
+                role: user.role.name,
+                emailVerified: user.emailVerified,
+                profile: user.doctorProfile || user.patientProfile || user.labTechnicianProfile
+            },
+            accessToken,
+            refreshToken
+        };
     },
 
     async loginAdmin(data: any, ip: string) {
@@ -180,8 +200,11 @@ export const AuthServices = {
         });
 
         if (!admin || !(await bcrypt.compare(data.password, admin.password))) {
+            logger.warn(`Admin login failed: Invalid credentials for admin ${data.email} from IP: ${ip}`);
             throw new AppError('Invalid admin credentials', 401);
         }
+
+        logger.info(`Admin ${data.email} logged in successfully from IP: ${ip}`);
 
         const accessToken = signAdminAccessToken(admin.id);
         const refreshToken = signAdminRefreshToken(admin.id);

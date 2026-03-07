@@ -1,0 +1,7 @@
+--- ADMIN USERS ---
+Admin: email=admin@securecare.local  id=00c42c40-75d7-4cb2-a816-5a9de8a21b8e
+
+--- REGULAR USERS ---
+User: email=pradeepslp2607@gmail.com  role=PATIENT  status=APPROVED  emailVerified=true
+User: email=pradeepsenthil2607@gmail.com  role=DOCTOR  status=APPROVED  emailVerified=true
+User: email=pradeepsenthil262007@gmail.com  role=LAB_TECHNICIAN  status=APPROVED  emailVerified=true

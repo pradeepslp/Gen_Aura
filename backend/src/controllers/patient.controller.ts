@@ -44,7 +44,20 @@ export const getPatientPrescriptions = asyncHandler(async (req: Request, res: Re
 
     const prescriptions = await prisma.prescription.findMany({
         where: { patientId },
-        include: { doctor: { select: { email: true } } },
+        include: {
+            doctor: {
+                select: {
+                    email: true,
+                    doctorProfile: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            specialization: true
+                        }
+                    }
+                }
+            }
+        },
         orderBy: { createdAt: 'desc' }
     });
 
@@ -83,7 +96,7 @@ export const getAssignedDoctors = asyncHandler(async (req: Request, res: Respons
 export const getPatientDashboardData = asyncHandler(async (req: Request, res: Response) => {
     const { patientId } = req.params;
 
-    const [patient, reports, prescriptions] = await Promise.all([
+    const [patient, reports, prescriptions, workflowRequests] = await Promise.all([
         prisma.patient.findUnique({
             where: { id: patientId },
             include: { vitals: true }
@@ -94,8 +107,26 @@ export const getPatientDashboardData = asyncHandler(async (req: Request, res: Re
         }),
         prisma.prescription.findMany({
             where: { patientId },
-            include: { doctor: { select: { email: true } } },
+            include: {
+                doctor: {
+                    select: {
+                        email: true,
+                        doctorProfile: {
+                            select: {
+                                firstName: true,
+                                lastName: true,
+                                specialization: true
+                            }
+                        }
+                    }
+                }
+            },
             orderBy: { createdAt: 'desc' }
+        }),
+        prisma.workflowRequest.findMany({
+            where: { patientId },
+            include: { currentDept: true },
+            orderBy: { updatedAt: 'desc' }
         })
     ]);
 
@@ -108,7 +139,32 @@ export const getPatientDashboardData = asyncHandler(async (req: Request, res: Re
         data: {
             patient,
             reports,
-            prescriptions
+            prescriptions,
+            workflowRequests
         }
     });
+});
+
+export const getAllDoctors = asyncHandler(async (req: Request, res: Response) => {
+    const doctors = await prisma.doctor.findMany({
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    email: true
+                }
+            }
+        }
+    });
+
+    const formattedDoctors = doctors.map((d: any) => ({
+        id: d.user.id,
+        email: d.user.email,
+        firstName: d.firstName,
+        lastName: d.lastName,
+        specialization: d.specialization,
+        licenseNumber: d.licenseNumber
+    }));
+
+    res.status(200).json({ success: true, doctors: formattedDoctors });
 });

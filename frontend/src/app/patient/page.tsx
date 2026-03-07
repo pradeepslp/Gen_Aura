@@ -13,8 +13,10 @@ import {
     Activity,
     Clock,
     User,
-    Clipboard
+    Clipboard,
+    MousePointer2
 } from 'lucide-react';
+import { PatientProgressTracker } from '@/components/workflow';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
 import { patientApi } from '@/lib/api';
@@ -26,6 +28,8 @@ export default function PatientDashboard() {
     const [profile, setProfile] = useState<any>(null);
     const [labs, setLabs] = useState<any[]>([]);
     const [prescriptions, setPrescriptions] = useState<any[]>([]);
+    const [workflowRequests, setWorkflowRequests] = useState<any[]>([]);
+    const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -34,10 +38,14 @@ export default function PatientDashboard() {
         const fetchData = async () => {
             try {
                 const res = await patientApi.getDashboardData(user.id);
-                const { patient, reports, prescriptions } = res.data.data;
+                const { patient, reports, prescriptions, workflowRequests } = res.data.data;
                 setProfile(patient);
                 setLabs(reports);
                 setPrescriptions(prescriptions);
+                setWorkflowRequests(workflowRequests || []);
+                if (workflowRequests && workflowRequests.length > 0) {
+                    setSelectedWorkflowId(workflowRequests[0].id);
+                }
             } catch (error) {
                 console.error("Failed to fetch patient data", error);
             } finally {
@@ -121,8 +129,9 @@ export default function PatientDashboard() {
                                                 <p className="text-xs text-slate-500 mt-1 font-mono tracking-tight">{pres.dosage}</p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-[10px] text-slate-400 font-mono uppercase">Prescribed by</p>
-                                                <p className="text-[10px] text-primary font-bold uppercase">{pres.doctor?.email}</p>
+                                                <p className="text-[10px] text-slate-400 font-mono uppercase tracking-widest mb-1 italic">Authorized Practitioner</p>
+                                                <p className="text-xs font-bold text-slate-900">Dr. {pres.doctor?.doctorProfile?.lastName}</p>
+                                                <p className="text-[10px] text-primary font-bold uppercase tracking-tighter">{pres.doctor?.doctorProfile?.specialization || 'Clinical Specialist'}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -173,13 +182,13 @@ export default function PatientDashboard() {
                                 Unsure who to see? Use our secure AI triage to analyze your symptoms and find the right specialist.
                             </p>
                             <div className="space-y-3">
-                                <Link href="/patient/triage">
+                                <Link href="/patient/doctors">
                                     <Button className="w-full bg-primary hover:opacity-90 shadow-lg shadow-primary/20 text-[10px] font-bold uppercase tracking-widest h-11 text-white">
-                                        Check Symptoms <ShieldCheck size={14} className="ml-2" />
+                                        Direct Booking <ShieldCheck size={14} className="ml-2" />
                                     </Button>
                                 </Link>
                                 <Link href="/patient/appointments/book" className="block text-center text-[10px] font-bold uppercase tracking-widest text-primary hover:underline py-2">
-                                    Direct Booking
+                                    Book with Symptoms
                                 </Link>
                             </div>
                         </div>
@@ -204,6 +213,51 @@ export default function PatientDashboard() {
                         </div>
                     </div>
                 </div>
+
+                {/* Workflow Tracking Section */}
+                <section className="mt-12">
+                    <div className="flex items-center gap-2 mb-8">
+                        <MousePointer2 className="h-5 w-5 text-primary" />
+                        <h2 className="font-bold uppercase tracking-wider text-sm">Inter-Department Workflow Status</h2>
+                    </div>
+
+                    <div className="grid lg:grid-cols-4 gap-8">
+                        <div className="lg:col-span-1 space-y-4">
+                            <div className="glass rounded-2xl p-6 border border-slate-100">
+                                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Your Active Requests</h3>
+                                <div className="space-y-2">
+                                    {workflowRequests.length === 0 ? (
+                                        <p className="text-xs text-slate-400 italic">No active workflow requests.</p>
+                                    ) : (
+                                        workflowRequests.map(req => (
+                                            <button
+                                                key={req.id}
+                                                onClick={() => setSelectedWorkflowId(req.id)}
+                                                className={`w-full text-left p-4 rounded-xl transition-all border ${selectedWorkflowId === req.id
+                                                    ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/20'
+                                                    : 'bg-white border-slate-100 hover:border-slate-300'
+                                                    }`}
+                                            >
+                                                <div className="font-bold text-xs truncate">{req.title}</div>
+                                                <div className="text-[10px] text-slate-500 mt-1 uppercase font-mono">{req.category}</div>
+                                            </button>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="lg:col-span-3">
+                            {selectedWorkflowId ? (
+                                <PatientProgressTracker requestId={selectedWorkflowId} />
+                            ) : (
+                                <div className="h-64 glass rounded-3xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
+                                    <Clock size={40} className="mb-4 opacity-20" />
+                                    <p className="text-sm font-medium italic">Select a request from the sidebar to track its real-time progress across hospital departments.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </section>
             </div>
         </ProtectedRoute>
     );

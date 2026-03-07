@@ -90,6 +90,7 @@ export const patientApi = {
     getPrescriptions: (patientId: string) => api.get(`/patients/${patientId}/prescriptions`),
     getAssignedDoctors: (patientId: string) => api.get(`/patients/${patientId}/doctors`),
     getDashboardData: (patientId: string) => api.get(`/patients/${patientId}/dashboard`),
+    getAllDoctors: () => api.get('/patients/doctors/all'),
 };
 
 export const triageApi = {
@@ -103,4 +104,12 @@ export const appointmentApi = {
     book: (data: any) => api.post('/appointments/book', data),
     getHistory: () => api.get('/appointments/history'),
     getPatientAppointments: (patientId: string) => api.get(`/appointments/patient/${patientId}`),
+};
+
+export const workflowApi = {
+    createRequest: (data: any) => api.post('/workflow/request', data),
+    moveRequest: (requestId: string, data: any) => api.patch(`/workflow/request/${requestId}/move`, data),
+    getQueue: () => api.get('/workflow/queue'),
+    getHistory: (requestId: string) => api.get(`/workflow/request/${requestId}/history`),
+    getDepartments: () => api.get('/workflow/departments'),
 };
